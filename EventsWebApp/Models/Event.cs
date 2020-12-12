@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace EventsWebApp.Models
 {
@@ -13,5 +14,6 @@ namespace EventsWebApp.Models
         public string Address { get; set; }
         public string ImageName { get; set; }
         public DateTime DateAndTime { get; set; }
+        public List<EventAttendee> EventAttendees { get; set; }
     }
 }
