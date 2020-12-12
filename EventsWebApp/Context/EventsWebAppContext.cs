@@ -4,10 +4,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EventsWebApp.Context
 {
-    public class EventsWebAppContext : IdentityDbContext
+    public class EventsWebAppContext : IdentityDbContext<User>
     {
         public EventsWebAppContext(DbContextOptions<EventsWebAppContext> options) : base(options)
         {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<Event> Event { get; set; }

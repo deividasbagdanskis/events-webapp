@@ -22,6 +22,8 @@ namespace EventsWebApp
         {
             services.AddControllersWithViews();
 
+            services.AddRazorPages();
+
             services.AddDbContext<EventsWebAppContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("EventsWebAppContext")));
         }
@@ -44,6 +46,7 @@ namespace EventsWebApp
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -51,6 +54,7 @@ namespace EventsWebApp
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
             });
         }
     }
