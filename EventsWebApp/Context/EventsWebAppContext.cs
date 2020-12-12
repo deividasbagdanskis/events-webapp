@@ -1,9 +1,10 @@
 ﻿using EventsWebApp.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace EventsWebApp.Context
 {
-    public class EventsWebAppContext : DbContext
+    public class EventsWebAppContext : IdentityDbContext
     {
         public EventsWebAppContext(DbContextOptions<EventsWebAppContext> options) : base(options)
         {
