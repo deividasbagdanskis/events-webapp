@@ -24,7 +24,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label">Category</label>
-                <select asp-for="CategoryId" asp-items="ViewBag.Categories"></select>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories"></select>
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -43,8 +43,13 @@
                 <span asp-validation-for="ImageName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="DateAndTime" class="control-label"></label>
-                <input asp-for="DateAndTime" class="form-control" />
+                <label for="date" class="control-label">Date</label>
+                <input name="date" type="date" class="form-control" />
+                <span asp-validation-for="DateAndTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="time" class="control-label">Time</label>
+                <input name="time" type="time" class="form-control" />
                 <span asp-validation-for="DateAndTime" class="text-danger"></span>
             </div>
             <div class="form-group">

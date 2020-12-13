@@ -17,5 +17,6 @@ namespace EventsWebApp.Context
 
         public DbSet<Event> Event { get; set; }
         public DbSet<Category> Category { get; set; }
+        public DbSet<EventAttendee> EventAttendee { get; set; }
     }
 }

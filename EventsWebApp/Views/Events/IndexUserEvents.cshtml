@@ -1,22 +1,19 @@
-﻿@model IEnumerable<EventsWebApp.Models.Event>
+﻿@model EventsWebApp.ViewModels.UserEventsViewModel
 
 @{
-    ViewData["Title"] = "IndexUserEvents";
+    ViewData["Title"] = "My Events";
 }
 
-<h1>IndexUserEvents</h1>
+<h1>Upcoming events</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayName("Name")
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                @Html.DisplayName("Description")
             </th>
             <th>
                 @Html.DisplayName("Category")
@@ -25,7 +22,7 @@
                 @Html.DisplayName("Date")
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.City)
+                @Html.DisplayName("City")
             </th>
             <th>
                 @Html.DisplayName("Going")
@@ -33,7 +30,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.UsersAttendEvents)
         {
             <tr>
                 <td>
@@ -56,10 +53,66 @@
                     @Html.DisplayFor(modelItem => item.EventAttendees.Count)
                 </td>
                 @*<td>
-                    @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                        |
-                    @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-                </td>*@
+                        @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                            |
+                        @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                    </td>*@
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h1 class="mt-3">My events</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayName("Name")
+            </th>
+            <th>
+                @Html.DisplayName("Description")
+            </th>
+            <th>
+                @Html.DisplayName("Category")
+            </th>
+            <th>
+                @Html.DisplayName("Date")
+            </th>
+            <th>
+                @Html.DisplayName("City")
+            </th>
+            <th>
+                @Html.DisplayName("Going")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.UsersCreatedEvents)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink(item.Name, "Details", new { id = item.Id })
+
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description.Substring(0, 20))
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateAndTime.ToString("m"))
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.City)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EventAttendees.Count)
+                </td>
             </tr>
         }
     </tbody>

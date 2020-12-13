@@ -1,5 +1,6 @@
 ﻿using EventsWebApp.Context;
 using EventsWebApp.Models;
+using EventsWebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace EventsWebApp.Controllers
@@ -15,10 +17,12 @@ namespace EventsWebApp.Controllers
     public class EventsController : Controller
     {
         private readonly EventsWebAppContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public EventsController(EventsWebAppContext context)
+        public EventsController(EventsWebAppContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: EventsController
@@ -106,7 +110,22 @@ namespace EventsWebApp.Controllers
         [Authorize]
         public async Task<ActionResult> IndexUserEvents()
         {
-            return View();
+            string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            UserEventsViewModel userEventsViewModel = new UserEventsViewModel();
+            userEventsViewModel.UsersCreatedEvents = await _context.Event
+                                                                    .Include(e => e.Category)
+                                                                    .Include(e => e.EventAttendees)
+                                                                    .Where(e => e.UserId == userId)
+                                                                    .ToListAsync();
+
+            var userAttend = await _context.EventAttendee.Include(e => e.Event)
+                                                         .Where(e => e.UserId == userId)
+                                                         .ToListAsync();
+
+            userEventsViewModel.UsersAttendEvents = userAttend.Select(e => e.Event).ToList();
+
+            return View(userEventsViewModel);
         }
 
         // GET: EventsController/Details/5
