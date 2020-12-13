@@ -27,7 +27,7 @@
                 <option value="0">All time</option>
                 <option value="7">Week</option>
                 <option value="14">2 weeks</option>
-                <option value="30">Months</option>
+                <option value="30">1 month</option>
             </select>
         </div>
     </div>
@@ -55,37 +55,34 @@
             </tr>
         </thead>
         <tbody>
-            @if (Model != null)
+            @foreach (var item in Model)
             {
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>
-                            @Html.ActionLink(item.Name, "Details", new { id = item.Id })
+                <tr>
+                    <td>
+                        @Html.ActionLink(item.Name, "Details", new { id = item.Id })
 
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Description.Substring(0, 20))
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Category.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.DateAndTime.ToString("m"))
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.City)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.EventAttendees.Count)
-                        </td>
-                        @*<td>
-                                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                                 |
-                                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-                            </td>*@
-                    </tr>
-                }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description.Substring(0, 20))
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Category.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DateAndTime.ToString("m"))
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.City)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EventAttendees.Count)
+                    </td>
+                    @*<td>
+                            @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                                |
+                            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                        </td>*@
+                </tr>
             }
         </tbody>
     </table>

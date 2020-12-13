@@ -32,6 +32,12 @@ namespace EventsWebApp.Controllers
 
             ViewData["Categories"] = new SelectList(categories, "Id", "Name");
 
+            return View(events);
+        }
+
+        [Authorize]
+        public async Task<ActionResult> IndexUserEvents()
+        {
             return View();
         }
 
@@ -42,8 +48,12 @@ namespace EventsWebApp.Controllers
         }
 
         // GET: EventsController/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
+            var categories = await _context.Category.ToListAsync();
+
+            ViewData["Categories"] = new SelectList(categories, "Id", "Name");
+
             return View();
         }
 
