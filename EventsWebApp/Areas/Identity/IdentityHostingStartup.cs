@@ -27,7 +27,9 @@ namespace EventsWebApp.Areas.Identity
                     options.Password.RequireDigit = false;
                     options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequireUppercase = false;
-                }).AddEntityFrameworkStores<EventsWebAppContext>();
+                    options.User.RequireUniqueEmail = true;
+
+                }).AddEntityFrameworkStores<EventsWebAppContext>().AddDefaultTokenProviders(); ;
 
                 services.AddAuthorization();
             });

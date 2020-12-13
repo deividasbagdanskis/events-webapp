@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace EmailService
 {
-    class Message
+    public class Message
     {
         public List<MailboxAddress> To { get; set; }
         public string Subject { get; set; }
