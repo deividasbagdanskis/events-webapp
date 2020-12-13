@@ -25,7 +25,75 @@ namespace EventsWebApp.Controllers
         [Authorize]
         public async Task<ActionResult> Index(string city = null, int categoryId = 0, int date = 0)
         {
-            var events = await _context.Event.Include(e => e.Category).Include(e => e.EventAttendees).ToListAsync();
+            List<Event> events = new List<Event>();
+
+            DateTime dateTimeInterval = DateTime.Today;
+            
+            if (date != 0)
+            {
+                dateTimeInterval = DateTime.Today.AddDays(date);
+            }
+            
+                
+            if (!string.IsNullOrWhiteSpace(city) && categoryId != 0 && date != 0)
+            {
+                events = await _context.Event.Include(e => e.Category)
+                                            .Include(e => e.EventAttendees)
+                                            .Where(e => e.City == city && 
+                                            e.CategoryId == categoryId && 
+                                            e.DateAndTime <= dateTimeInterval)
+                                            .ToListAsync();
+            }
+            else if (!string.IsNullOrWhiteSpace(city) && categoryId != 0)
+            {
+                events = await _context.Event.Include(e => e.Category)
+                                            .Include(e => e.EventAttendees)
+                                            .Where(e => e.City == city &&
+                                            e.CategoryId == categoryId)
+                                            .ToListAsync();
+            } 
+            else if (!string.IsNullOrWhiteSpace(city) && date != 0)
+            {
+                events = await _context.Event.Include(e => e.Category)
+                                            .Include(e => e.EventAttendees)
+                                            .Where(e => e.City == city &&
+                                            e.DateAndTime <= dateTimeInterval)
+                                            .ToListAsync();
+            }
+            else if (categoryId != 0 && date != 0)
+            {
+                events = await _context.Event.Include(e => e.Category)
+                                            .Include(e => e.EventAttendees)
+                                            .Where(e => e.CategoryId == categoryId &&
+                                            e.DateAndTime <= dateTimeInterval)
+                                            .ToListAsync();
+            }
+            else if (!string.IsNullOrWhiteSpace(city))
+            {
+                events = await _context.Event.Include(e => e.Category)
+                                            .Include(e => e.EventAttendees)
+                                            .Where(e => e.City == city)
+                                            .ToListAsync();
+            }
+            else if (categoryId != 0)
+            {
+                events = await _context.Event.Include(e => e.Category)
+                                            .Include(e => e.EventAttendees)
+                                            .Where(e => e.CategoryId == categoryId)
+                                            .ToListAsync();
+            }
+            else if (date != 0)
+            {
+                events = await _context.Event.Include(e => e.Category)
+                                            .Include(e => e.EventAttendees)
+                                            .Where(e => e.DateAndTime <= dateTimeInterval)
+                                            .ToListAsync();
+            }
+            else
+            {
+                events = await _context.Event.ToListAsync();
+            }
+
             var categories = await _context.Category.ToListAsync();
 
             categories.Insert(0, new Category() { Id = 0, Name = "All" });
