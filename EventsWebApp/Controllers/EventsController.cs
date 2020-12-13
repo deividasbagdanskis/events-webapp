@@ -147,16 +147,35 @@ namespace EventsWebApp.Controllers
         // POST: EventsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(Event @event, DateTime date, TimeSpan time)
         {
-            try
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                @event.UserId = userId;
+
+                @event.DateAndTime = date + time;
+
+                try
+                {
+                    _context.Event.Add(@event);
+                    await _context.SaveChangesAsync();
+                }
+                catch
+                {
+                    var categories = await _context.Category.ToListAsync();
+
+                    ViewData["Categories"] = new SelectList(categories, "Id", "Name");
+
+                }
+
+                return RedirectToAction(nameof(IndexUserEvents));
             }
-            catch
-            {
-                return View();
-            }
+
+            ViewData["Categories"] = new SelectList(await _context.Category.ToListAsync(), "Id", "Name");
+
+            return View(@event);
         }
 
         // GET: EventsController/Edit/5
