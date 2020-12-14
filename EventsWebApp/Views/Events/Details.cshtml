@@ -1,0 +1,47 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using EventsWebApp.Models
+
+@inject SignInManager<User> SignInManager
+
+@model EventsWebApp.Models.Event
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="col-lg-8 px-3 mx-auto mt-3">
+    <h2 class="text-center">@Model.Name</h2>
+    <hr />
+    <div class="text-center mb-3">
+        <img class="w-50" src="@Url.Content($"~/images/{Model.ImageName}")" />
+    </div>
+    <p>@Model.Description</p>
+    <div class="row my-3 mx-0 justify-content-between">
+        <p>@Model.DateAndTime.DayOfWeek,&nbsp;@Model.DateAndTime.ToString("m"),&nbsp;@Model.DateAndTime.ToString("HH:mm")</p>
+        <p>@Model.Address,&nbsp;@Model.City</p>
+    </div>
+    <div class="row my-3 mx-0 justify-content-between">
+        <p>@Model.EventAttendees.Count&nbsp;people are going</p>
+        @if (SignInManager.UserManager.GetUserId(User) != Model.UserId)
+        {
+            if (ViewBag.UserWillAttend == false)
+            {
+                <a class="btn btn-primary">Going</a>
+            }
+            else
+            {
+                <a class="btn btn-primary">Not going</a>
+            }
+        }
+    </div>
+    <div class="row px-3">
+        @if (SignInManager.UserManager.GetUserId(User) == Model.UserId)
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+            <p>&nbsp;|&nbsp;</p>
+            <a asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
+            <p>&nbsp;|&nbsp;</p>
+        }
+        <a asp-action="Index">Back to List</a>
+    </div>
+</div>

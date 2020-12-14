@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace EventsWebApp.Controllers
@@ -23,6 +25,8 @@ namespace EventsWebApp.Controllers
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-Us");
+
         }
 
         // GET: EventsController
@@ -129,9 +133,38 @@ namespace EventsWebApp.Controllers
         }
 
         // GET: EventsController/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Event @event = await _context.Event.Include(e => e.EventAttendees).Where(e => e.Id == id).FirstOrDefaultAsync();
+
+            @event.Category = await _context.Category.FindAsync(@event.CategoryId);
+
+            string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            EventAttendee userAttendEvent = await _context.EventAttendee.Include(e => e.Event)
+                                                         .Where(e => e.UserId == userId && e.EventId == id)
+                                                         .FirstOrDefaultAsync();
+
+            bool userWillAttend = false;
+
+            if (userAttendEvent != null)
+            {
+                userWillAttend = true;
+            }
+
+            ViewData["UserWillAttend"] = userWillAttend;
+
+            if (@event == null)
+            {
+                return NotFound();
+            }
+
+            return View(@event);
         }
 
         // GET: EventsController/Create
