@@ -99,7 +99,7 @@ namespace EventsWebApp.Controllers
             }
             else
             {
-                events = await _context.Event.ToListAsync();
+                events = await _context.Event.Include(e => e.Category).Include(e => e.EventAttendees).ToListAsync();
             }
 
             var categories = await _context.Category.ToListAsync();
@@ -168,6 +168,7 @@ namespace EventsWebApp.Controllers
         }
 
         // GET: EventsController/Create
+        [Authorize]
         public async Task<ActionResult> Create()
         {
             var categories = await _context.Category.ToListAsync();
@@ -178,6 +179,7 @@ namespace EventsWebApp.Controllers
         }
 
         // POST: EventsController/Create
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Event @event, DateTime date, TimeSpan time)
@@ -201,6 +203,7 @@ namespace EventsWebApp.Controllers
 
                     ViewData["Categories"] = new SelectList(categories, "Id", "Name");
 
+                    return View(@event);
                 }
 
                 return RedirectToAction(nameof(IndexUserEvents));

@@ -22,15 +22,20 @@
     </div>
     <div class="row my-3 mx-0 justify-content-between">
         <p>@Model.EventAttendees.Count&nbsp;people are going</p>
+
         @if (SignInManager.UserManager.GetUserId(User) != Model.UserId)
         {
             if (ViewBag.UserWillAttend == false)
             {
-                <a class="btn btn-primary">Going</a>
+                <form asp-controller="EventAttendee" asp-action="Create" asp-route-eventId="@Model.Id" asp-route-userId="@SignInManager.UserManager.GetUserId(User)">
+                    <button type="submit" class="btn btn-primary">Going</button>
+                </form>
             }
             else
             {
-                <a class="btn btn-primary">Not going</a>
+                <form asp-controller="EventAttendee" asp-action="Delete" asp-route-eventId="@Model.Id" asp-route-userId="@SignInManager.UserManager.GetUserId(User)">
+                    <button type="submit" class="btn btn-primary">Not going</button>
+                </form>
             }
         }
     </div>
