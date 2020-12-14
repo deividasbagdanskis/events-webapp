@@ -232,24 +232,87 @@ namespace EventsWebApp.Controllers
         }
 
         // GET: EventsController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Event @event = await _context.Event.Include(e => e.Category).Where(e => e.Id == id).FirstOrDefaultAsync();
+
+            //@event.Category = await _context.Category.FindAsync(@event.CategoryId);
+
+            var categories = await _context.Category.ToListAsync();
+
+            ViewData["Categories"] = new SelectList(categories, "Id", "Name");
+
+            return View(@event);
         }
 
         // POST: EventsController/Edit/5
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(int id, Event @event, DateTime date, TimeSpan time,
+            [FromForm(Name = "imageFile")] IFormFile imageFile)
         {
-            try
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                @event.UserId = userId;
+
+                @event.DateAndTime = date + time;
+
+                Event oldEvent = await _context.Event.FindAsync(id);
+
+                string uniqueFileName = null;
+
+                if (imageFile != null)
+                {
+                    string imageFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+                    string imagePath = Path.Combine(imageFolder, oldEvent.ImageName);
+
+                    FileInfo fileInfo = new FileInfo(imagePath);
+
+                    System.IO.File.Delete(imagePath);
+
+                    fileInfo.Delete();
+
+                    string uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                    string filePath = Path.Combine(uploadFolder, uniqueFileName);
+                    imageFile.CopyTo(new FileStream(filePath, FileMode.Create));
+
+                    @event.ImageName = uniqueFileName;
+                }
+                else
+                {
+                    @event.ImageName = oldEvent.ImageName;
+                }
+
+                try
+                {
+                    _context.Entry(oldEvent).State = EntityState.Detached;
+                    _context.Update(@event);
+                    await _context.SaveChangesAsync();
+                }
+                catch
+                {
+                    var categories = await _context.Category.ToListAsync();
+
+                    ViewData["Categories"] = new SelectList(categories, "Id", "Name");
+
+                    return View(@event);
+                }
+
+                return RedirectToAction(nameof(IndexUserEvents));
             }
-            catch
-            {
-                return View();
-            }
+
+            ViewData["Categories"] = new SelectList(await _context.Category.ToListAsync(), "Id", "Name");
+
+            return View(@event);
         }
 
         // GET: EventsController/Delete/5
@@ -283,8 +346,6 @@ namespace EventsWebApp.Controllers
                 string imagePath = Path.Combine(imageFolder, @event.ImageName);
 
                 FileInfo fileInfo = new FileInfo(imagePath);
-
-                System.IO.File.Delete(imagePath);
 
                 fileInfo.Delete();
             }
