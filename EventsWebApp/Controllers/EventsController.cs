@@ -2,6 +2,7 @@
 using EventsWebApp.Models;
 using EventsWebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -20,13 +22,15 @@ namespace EventsWebApp.Controllers
     {
         private readonly EventsWebAppContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public EventsController(EventsWebAppContext context, IHttpContextAccessor httpContextAccessor)
+        public EventsController(EventsWebAppContext context, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
-            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-Us");
+            _webHostEnvironment = webHostEnvironment;
 
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-Us");
         }
 
         // GET: EventsController
@@ -117,13 +121,13 @@ namespace EventsWebApp.Controllers
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             UserEventsViewModel userEventsViewModel = new UserEventsViewModel();
-            userEventsViewModel.UsersCreatedEvents = await _context.Event
-                                                                    .Include(e => e.Category)
-                                                                    .Include(e => e.EventAttendees)
-                                                                    .Where(e => e.UserId == userId)
-                                                                    .ToListAsync();
+            userEventsViewModel.UsersCreatedEvents = await _context.Event.Include(e => e.Category)
+                                                                         .Include(e => e.EventAttendees)
+                                                                         .Where(e => e.UserId == userId)
+                                                                         .ToListAsync();
 
             var userAttend = await _context.EventAttendee.Include(e => e.Event)
+                                                         .Include(e => e.Event.Category)
                                                          .Where(e => e.UserId == userId)
                                                          .ToListAsync();
 
@@ -182,7 +186,8 @@ namespace EventsWebApp.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Event @event, DateTime date, TimeSpan time)
+        public async Task<IActionResult> Create(Event @event, DateTime date, TimeSpan time,
+            [FromForm(Name = "imageFile")] IFormFile imageFile)
         {
             if (ModelState.IsValid)
             {
@@ -191,6 +196,18 @@ namespace EventsWebApp.Controllers
                 @event.UserId = userId;
 
                 @event.DateAndTime = date + time;
+
+                string uniqueFileName = null;
+
+                if (imageFile != null)
+                {
+                    string uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                    string filePath = Path.Combine(uploadFolder, uniqueFileName);
+                    imageFile.CopyTo(new FileStream(filePath, FileMode.Create));
+
+                    @event.ImageName = uniqueFileName;
+                }
 
                 try
                 {
