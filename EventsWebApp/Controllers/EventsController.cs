@@ -241,8 +241,6 @@ namespace EventsWebApp.Controllers
 
             Event @event = await _context.Event.Include(e => e.Category).Where(e => e.Id == id).FirstOrDefaultAsync();
 
-            //@event.Category = await _context.Category.FindAsync(@event.CategoryId);
-
             var categories = await _context.Category.ToListAsync();
 
             ViewData["Categories"] = new SelectList(categories, "Id", "Name");
