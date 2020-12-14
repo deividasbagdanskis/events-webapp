@@ -81,7 +81,7 @@ namespace EventsWebApp.Areas.Identity.Pages.Account
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
 
-                    return LocalRedirect(returnUrl);
+                    return RedirectToAction("Index", "Events");
                 }
 
                 foreach (var error in result.Errors)
