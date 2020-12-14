@@ -253,23 +253,54 @@ namespace EventsWebApp.Controllers
         }
 
         // GET: EventsController/Delete/5
-        public ActionResult Delete(int id)
+        [Authorize]
+        public async Task<ActionResult> Delete(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Event @event = await _context.Event.Include(e => e.EventAttendees).Where(e => e.Id == id).FirstOrDefaultAsync();
+
+            @event.Category = await _context.Category.FindAsync(@event.CategoryId);
+
+            return View(@event);
         }
 
         // POST: EventsController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Delete(int id)
         {
+            Event @event = await _context.Event.Include(e => e.EventAttendees).Where(e => e.Id == id).FirstOrDefaultAsync();
+
+            var eventAttendees = await _context.EventAttendee.Where(e => e.EventId == id).ToListAsync();
+
+            if (@event.ImageName != null)
+            {
+                string imageFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+                string imagePath = Path.Combine(imageFolder, @event.ImageName);
+
+                FileInfo fileInfo = new FileInfo(imagePath);
+
+                System.IO.File.Delete(imagePath);
+
+                fileInfo.Delete();
+            }
+
             try
             {
-                return RedirectToAction(nameof(Index));
+                _context.EventAttendee.RemoveRange(eventAttendees);
+                _context.Event.Remove(@event);
+
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(IndexUserEvents));
             }
             catch
             {
-                return View();
+                return View(id);
             }
         }
     }
