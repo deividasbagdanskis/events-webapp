@@ -204,7 +204,10 @@ namespace EventsWebApp.Controllers
                     string uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
                     uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
                     string filePath = Path.Combine(uploadFolder, uniqueFileName);
-                    imageFile.CopyTo(new FileStream(filePath, FileMode.Create));
+
+                    using FileStream fileStream = new FileStream(filePath, FileMode.Create);
+
+                    imageFile.CopyTo(fileStream);
 
                     @event.ImageName = uniqueFileName;
                 }
