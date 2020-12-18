@@ -1,0 +1,31 @@
+﻿@model EventsWebApp.Models.Event
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+
+<div class="col-lg-8 px-3 mx-auto mt-3">
+    <h1>Delete</h1>
+
+    <h3 class="mb-2">Are you sure you want to delete this?</h3>
+    <h2 class="text-center">@Model.Name</h2>
+    <hr />
+    <div class="text-center mb-3">
+        <img class="w-50" src="@Url.Content($"~/images/{Model.ImageName}")" />
+    </div>
+    <p>@Model.Description</p>
+    <div class="row my-3 mx-0 justify-content-between">
+        <p>@Model.DateAndTime.DayOfWeek,&nbsp;@Model.DateAndTime.ToString("m"),&nbsp;@Model.DateAndTime.ToString("HH:mm")</p>
+        <p>@Model.Address,&nbsp;@Model.City</p>
+    </div>
+    <div class="row my-3 mx-0 justify-content-between">
+        <p>@Model.EventAttendees.Count&nbsp;people are going</p>
+    </div>
+    <div class="row px-3 justify-content-end">
+        <form asp-action="Delete">
+            <input type="submit" value="Delete" class="btn btn-danger" /> |
+            <a asp-action="Index">Back to List</a>
+        </form>
+    </div>
+</div>
