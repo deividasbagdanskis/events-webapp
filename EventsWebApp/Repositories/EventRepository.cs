@@ -17,13 +17,13 @@ namespace EventsWebApp.Repositories
             _context = context;
         }
 
-        public async void AddEvent(Event @event)
+        public async void Add(Event @event)
         {
             _context.Event.Add(@event);
             await _context.SaveChangesAsync();
         }
 
-        public async void DeleteEvent(int id)
+        public async void Delete(int id)
         {
             Event @event = await GetEvent(id);
             var eventAttendees = await _context.EventAttendee.Where(e => e.EventId == id).ToListAsync();
@@ -111,7 +111,16 @@ namespace EventsWebApp.Repositories
                                         .ToListAsync();
         }
 
-        public async void UpdateEvent(Event newEvent, Event oldEvent)
+        public async Task<List<Event>> GetEventsWhichUserWillAttend(string userId)
+        {
+            return await _context.EventAttendee.Include(e => e.Event)
+                                                .Include(e => e.Event.Category)
+                                                .Where(e => e.UserId == userId)
+                                                .Select(e => e.Event)
+                                                .ToListAsync();
+        }
+
+        public async void Update(Event newEvent, Event oldEvent)
         {
             _context.Entry(oldEvent).State = EntityState.Detached;
             _context.Update(newEvent);

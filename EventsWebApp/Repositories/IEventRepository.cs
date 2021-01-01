@@ -16,9 +16,10 @@ namespace EventsWebApp.Repositories
         Task<List<Event>> GetEventsByCategory(int categoryId);
         Task<List<Event>> GetEventsByDate(DateTime dateTimeInterval);
         Task<List<Event>> GetUsersCreatedEvents(string userId);
+        Task<List<Event>> GetEventsWhichUserWillAttend(string userId);
         Task<Event> GetEvent(int id);
-        void AddEvent(Event @event);
-        void UpdateEvent(Event newEvent, Event oldEvent);
-        void DeleteEvent(int id);
+        void Add(Event @event);
+        void Update(Event newEvent, Event oldEvent);
+        void Delete(int id);
     }
 }
