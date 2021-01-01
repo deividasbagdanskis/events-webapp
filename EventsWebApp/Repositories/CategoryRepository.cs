@@ -15,6 +15,11 @@ namespace EventsWebApp.Repositories
             _context = context;
         }
 
+        public async Task<Category> Get(int id)
+        {
+            return await _context.Category.FindAsync(id);
+        }
+
         public async Task<List<Category>> GetAll()
         {
             return await _context.Category.ToListAsync();
