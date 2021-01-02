@@ -1,15 +1,14 @@
-﻿using EventsWebApp.Models;
+﻿using EventsWebApp.Helpers;
+using EventsWebApp.Models;
 using EventsWebApp.Repositories;
 using EventsWebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,17 +21,16 @@ namespace EventsWebApp.Controllers
         private readonly IEventAttendeeRepository _eventAttendeeRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IImageHelper _imageHelper;
 
         public EventsController(IEventRepository eventRepository, IEventAttendeeRepository eventAttendeeRepository,
-            ICategoryRepository categoryRepository, IHttpContextAccessor httpContextAccessor, 
-            IWebHostEnvironment webHostEnvironment)
+            ICategoryRepository categoryRepository, IHttpContextAccessor httpContextAccessor, IImageHelper imageHelper)
         {
             _eventRepository = eventRepository;
             _eventAttendeeRepository = eventAttendeeRepository;
             _categoryRepository = categoryRepository;
             _httpContextAccessor = httpContextAccessor;
-            _webHostEnvironment = webHostEnvironment;
+            _imageHelper = imageHelper;
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-Us");
         }
@@ -163,19 +161,9 @@ namespace EventsWebApp.Controllers
 
                 @event.DateAndTime = date + time;
 
-                string uniqueFileName = null;
-
                 if (imageFile != null)
                 {
-                    string uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
-                    uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
-                    string filePath = Path.Combine(uploadFolder, uniqueFileName);
-
-                    using FileStream fileStream = new FileStream(filePath, FileMode.Create);
-
-                    imageFile.CopyTo(fileStream);
-
-                    @event.ImageName = uniqueFileName;
+                    @event.ImageName = _imageHelper.Save(imageFile);
                 }
 
                 try
@@ -233,25 +221,11 @@ namespace EventsWebApp.Controllers
 
                 Event oldEvent = await _eventRepository.GetEvent(id);
 
-                string uniqueFileName = null;
-
                 if (imageFile != null)
                 {
-                    string imageFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
-                    string imagePath = Path.Combine(imageFolder, oldEvent.ImageName);
+                    _imageHelper.Delete(oldEvent.ImageName);
 
-                    FileInfo fileInfo = new FileInfo(imagePath);
-
-                    System.IO.File.Delete(imagePath);
-
-                    fileInfo.Delete();
-
-                    string uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
-                    uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
-                    string filePath = Path.Combine(uploadFolder, uniqueFileName);
-                    imageFile.CopyTo(new FileStream(filePath, FileMode.Create));
-
-                    @event.ImageName = uniqueFileName;
+                    @event.ImageName = _imageHelper.Save(imageFile);
                 }
                 else
                 {
@@ -304,12 +278,7 @@ namespace EventsWebApp.Controllers
 
             if (@event.ImageName != null)
             {
-                string imageFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
-                string imagePath = Path.Combine(imageFolder, @event.ImageName);
-
-                FileInfo fileInfo = new FileInfo(imagePath);
-
-                fileInfo.Delete();
+                _imageHelper.Delete(@event.ImageName);
             }
 
             try

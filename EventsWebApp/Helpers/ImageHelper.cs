@@ -7,7 +7,7 @@ namespace EventsWebApp.Helpers
 {
     public class ImageHelper : IImageHelper
     {
-        private string _imageFolder;
+        private readonly string _imageFolder;
 
         public ImageHelper(IWebHostEnvironment webHostEnvironment)
         {

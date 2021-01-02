@@ -1,5 +1,6 @@
 using EmailService;
 using EventsWebApp.Context;
+using EventsWebApp.Helpers;
 using EventsWebApp.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,6 +37,7 @@ namespace EventsWebApp
             services.AddScoped<IEventRepository, EventRepository>();
             services.AddScoped<IEventAttendeeRepository, EventAttendeeRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IImageHelper, ImageHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
