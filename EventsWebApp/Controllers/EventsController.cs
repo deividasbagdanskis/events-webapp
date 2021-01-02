@@ -1,5 +1,4 @@
-﻿using EventsWebApp.Context;
-using EventsWebApp.Models;
+﻿using EventsWebApp.Models;
 using EventsWebApp.Repositories;
 using EventsWebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -7,12 +6,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,17 +20,17 @@ namespace EventsWebApp.Controllers
     {
         private readonly IEventRepository _eventRepository;
         private readonly IEventAttendeeRepository _eventAttendeeRepository;
-        private readonly EventsWebAppContext _context;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public EventsController(IEventRepository eventRepository, IEventAttendeeRepository eventAttendeeRepository, 
-            EventsWebAppContext context, IHttpContextAccessor httpContextAccessor, 
+        public EventsController(IEventRepository eventRepository, IEventAttendeeRepository eventAttendeeRepository,
+            ICategoryRepository categoryRepository, IHttpContextAccessor httpContextAccessor, 
             IWebHostEnvironment webHostEnvironment)
         {
             _eventRepository = eventRepository;
             _eventAttendeeRepository = eventAttendeeRepository;
-            _context = context;
+            _categoryRepository = categoryRepository;
             _httpContextAccessor = httpContextAccessor;
             _webHostEnvironment = webHostEnvironment;
 
@@ -86,7 +83,7 @@ namespace EventsWebApp.Controllers
                 events = await _eventRepository.GetAllEvents();
             }
 
-            var categories = await _context.Category.ToListAsync();
+            var categories = await _categoryRepository.GetAll();
 
             categories.Insert(0, new Category() { Id = 0, Name = "All" });
 
@@ -117,7 +114,7 @@ namespace EventsWebApp.Controllers
 
             Event @event = await _eventRepository.GetEvent((int)id);
 
-            @event.Category = await _context.Category.FindAsync(@event.CategoryId);
+            @event.Category = await _categoryRepository.Get(@event.CategoryId);
 
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -144,7 +141,7 @@ namespace EventsWebApp.Controllers
         [Authorize]
         public async Task<ActionResult> Create()
         {
-            var categories = await _context.Category.ToListAsync();
+            var categories = await _categoryRepository.GetAll();
 
             ViewData["Categories"] = new SelectList(categories, "Id", "Name");
 
@@ -187,7 +184,7 @@ namespace EventsWebApp.Controllers
                 }
                 catch
                 {
-                    var categories = await _context.Category.ToListAsync();
+                    var categories = await _categoryRepository.GetAll();
 
                     ViewData["Categories"] = new SelectList(categories, "Id", "Name");
 
@@ -197,7 +194,7 @@ namespace EventsWebApp.Controllers
                 return RedirectToAction(nameof(IndexUserEvents));
             }
 
-            ViewData["Categories"] = new SelectList(await _context.Category.ToListAsync(), "Id", "Name");
+            ViewData["Categories"] = new SelectList(await _categoryRepository.GetAll(), "Id", "Name");
 
             return View(@event);
         }
@@ -212,7 +209,7 @@ namespace EventsWebApp.Controllers
 
             Event @event = await _eventRepository.GetEvent((int)id);
 
-            var categories = await _context.Category.ToListAsync();
+            var categories = await _categoryRepository.GetAll();
 
             ViewData["Categories"] = new SelectList(categories, "Id", "Name");
 
@@ -267,7 +264,7 @@ namespace EventsWebApp.Controllers
                 }
                 catch
                 {
-                    var categories = await _context.Category.ToListAsync();
+                    var categories = await _categoryRepository.GetAll();
 
                     ViewData["Categories"] = new SelectList(categories, "Id", "Name");
 
@@ -277,7 +274,7 @@ namespace EventsWebApp.Controllers
                 return RedirectToAction(nameof(IndexUserEvents));
             }
 
-            ViewData["Categories"] = new SelectList(await _context.Category.ToListAsync(), "Id", "Name");
+            ViewData["Categories"] = new SelectList(await _categoryRepository.GetAll(), "Id", "Name");
 
             return View(@event);
         }
@@ -293,7 +290,7 @@ namespace EventsWebApp.Controllers
 
             Event @event = await _eventRepository.GetEvent((int)id);
 
-            @event.Category = await _context.Category.FindAsync(@event.CategoryId);
+            @event.Category = await _categoryRepository.Get(@event.CategoryId);
 
             return View(@event);
         }

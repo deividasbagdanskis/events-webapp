@@ -35,6 +35,7 @@ namespace EventsWebApp
 
             services.AddScoped<IEventRepository, EventRepository>();
             services.AddScoped<IEventAttendeeRepository, EventAttendeeRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
