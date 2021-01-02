@@ -5,7 +5,11 @@ VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventsWebApp", "EventsWebApp\EventsWebApp.csproj", "{A433C5E0-1795-483A-8B71-011884FB8321}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailService", "EmailService\EmailService.csproj", "{3B968D4C-1CB5-4920-BB19-B4A7984C2358}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailService", "EmailService\EmailService.csproj", "{3B968D4C-1CB5-4920-BB19-B4A7984C2358}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{53BBA8D5-C42F-4737-848D-FDE22719EF0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventsWebApp.UnitTests", "EventsWebApp.UnitTests\EventsWebApp.UnitTests.csproj", "{65209CB1-801C-4787-98AD-84607E143657}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +25,16 @@ Global
 		{3B968D4C-1CB5-4920-BB19-B4A7984C2358}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B968D4C-1CB5-4920-BB19-B4A7984C2358}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B968D4C-1CB5-4920-BB19-B4A7984C2358}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65209CB1-801C-4787-98AD-84607E143657}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65209CB1-801C-4787-98AD-84607E143657}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65209CB1-801C-4787-98AD-84607E143657}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65209CB1-801C-4787-98AD-84607E143657}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{65209CB1-801C-4787-98AD-84607E143657} = {53BBA8D5-C42F-4737-848D-FDE22719EF0B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A7C79AF-4186-4288-8CB9-5C767C2B56DC}
