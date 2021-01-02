@@ -1,17 +1,15 @@
-﻿using EventsWebApp.Context;
-using EventsWebApp.Models;
+﻿using EventsWebApp.Models;
+using EventsWebApp.Repositories;
 using EventsWebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,13 +18,19 @@ namespace EventsWebApp.Controllers
 {
     public class EventsController : Controller
     {
-        private readonly EventsWebAppContext _context;
+        private readonly IEventRepository _eventRepository;
+        private readonly IEventAttendeeRepository _eventAttendeeRepository;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public EventsController(EventsWebAppContext context, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment)
+        public EventsController(IEventRepository eventRepository, IEventAttendeeRepository eventAttendeeRepository,
+            ICategoryRepository categoryRepository, IHttpContextAccessor httpContextAccessor, 
+            IWebHostEnvironment webHostEnvironment)
         {
-            _context = context;
+            _eventRepository = eventRepository;
+            _eventAttendeeRepository = eventAttendeeRepository;
+            _categoryRepository = categoryRepository;
             _httpContextAccessor = httpContextAccessor;
             _webHostEnvironment = webHostEnvironment;
 
@@ -37,7 +41,7 @@ namespace EventsWebApp.Controllers
         [Authorize]
         public async Task<ActionResult> Index(string city = null, int categoryId = 0, int date = 0)
         {
-            List<Event> events = new List<Event>();
+            List<Event> events;
 
             DateTime dateTimeInterval = DateTime.Today;
             
@@ -46,67 +50,40 @@ namespace EventsWebApp.Controllers
                 dateTimeInterval = DateTime.Today.AddDays(date);
             }
             
-                
             if (!string.IsNullOrWhiteSpace(city) && categoryId != 0 && date != 0)
             {
-                events = await _context.Event.Include(e => e.Category)
-                                            .Include(e => e.EventAttendees)
-                                            .Where(e => e.City == city && 
-                                            e.CategoryId == categoryId && 
-                                            e.DateAndTime <= dateTimeInterval)
-                                            .ToListAsync();
+                events = await _eventRepository.GetEventsByCityCategoryDate(city, categoryId, dateTimeInterval);
             }
             else if (!string.IsNullOrWhiteSpace(city) && categoryId != 0)
             {
-                events = await _context.Event.Include(e => e.Category)
-                                            .Include(e => e.EventAttendees)
-                                            .Where(e => e.City == city &&
-                                            e.CategoryId == categoryId)
-                                            .ToListAsync();
+                events = await _eventRepository.GetEventsByCityCategory(city, categoryId);
             } 
             else if (!string.IsNullOrWhiteSpace(city) && date != 0)
             {
-                events = await _context.Event.Include(e => e.Category)
-                                            .Include(e => e.EventAttendees)
-                                            .Where(e => e.City == city &&
-                                            e.DateAndTime <= dateTimeInterval)
-                                            .ToListAsync();
+                events = await _eventRepository.GetEventsByCityDate(city, dateTimeInterval);
             }
             else if (categoryId != 0 && date != 0)
             {
-                events = await _context.Event.Include(e => e.Category)
-                                            .Include(e => e.EventAttendees)
-                                            .Where(e => e.CategoryId == categoryId &&
-                                            e.DateAndTime <= dateTimeInterval)
-                                            .ToListAsync();
+                events = await _eventRepository.GetEventsByCategoryDate(categoryId, dateTimeInterval);
             }
             else if (!string.IsNullOrWhiteSpace(city))
             {
-                events = await _context.Event.Include(e => e.Category)
-                                            .Include(e => e.EventAttendees)
-                                            .Where(e => e.City == city)
-                                            .ToListAsync();
+                events = await _eventRepository.GetEventsByCity(city);
             }
             else if (categoryId != 0)
             {
-                events = await _context.Event.Include(e => e.Category)
-                                            .Include(e => e.EventAttendees)
-                                            .Where(e => e.CategoryId == categoryId)
-                                            .ToListAsync();
+                events = await _eventRepository.GetEventsByCategory(categoryId);
             }
             else if (date != 0)
             {
-                events = await _context.Event.Include(e => e.Category)
-                                            .Include(e => e.EventAttendees)
-                                            .Where(e => e.DateAndTime <= dateTimeInterval)
-                                            .ToListAsync();
+                events = await _eventRepository.GetEventsByDate(dateTimeInterval);
             }
             else
             {
-                events = await _context.Event.Include(e => e.Category).Include(e => e.EventAttendees).ToListAsync();
+                events = await _eventRepository.GetAllEvents();
             }
 
-            var categories = await _context.Category.ToListAsync();
+            var categories = await _categoryRepository.GetAll();
 
             categories.Insert(0, new Category() { Id = 0, Name = "All" });
 
@@ -121,17 +98,8 @@ namespace EventsWebApp.Controllers
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             UserEventsViewModel userEventsViewModel = new UserEventsViewModel();
-            userEventsViewModel.UsersCreatedEvents = await _context.Event.Include(e => e.Category)
-                                                                         .Include(e => e.EventAttendees)
-                                                                         .Where(e => e.UserId == userId)
-                                                                         .ToListAsync();
-
-            var userAttend = await _context.EventAttendee.Include(e => e.Event)
-                                                         .Include(e => e.Event.Category)
-                                                         .Where(e => e.UserId == userId)
-                                                         .ToListAsync();
-
-            userEventsViewModel.UsersAttendEvents = userAttend.Select(e => e.Event).ToList();
+            userEventsViewModel.UsersCreatedEvents = await _eventRepository.GetUsersCreatedEvents(userId);
+            userEventsViewModel.UsersAttendEvents = await _eventRepository.GetEventsWhichUserWillAttend(userId);
 
             return View(userEventsViewModel);
         }
@@ -144,15 +112,13 @@ namespace EventsWebApp.Controllers
                 return NotFound();
             }
 
-            Event @event = await _context.Event.Include(e => e.EventAttendees).Where(e => e.Id == id).FirstOrDefaultAsync();
+            Event @event = await _eventRepository.GetEvent((int)id);
 
-            @event.Category = await _context.Category.FindAsync(@event.CategoryId);
+            @event.Category = await _categoryRepository.Get(@event.CategoryId);
 
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            EventAttendee userAttendEvent = await _context.EventAttendee.Include(e => e.Event)
-                                                         .Where(e => e.UserId == userId && e.EventId == id)
-                                                         .FirstOrDefaultAsync();
+            EventAttendee userAttendEvent = await _eventAttendeeRepository.GetUserAttendEvent(userId, (int)id);
 
             bool userWillAttend = false;
 
@@ -175,7 +141,7 @@ namespace EventsWebApp.Controllers
         [Authorize]
         public async Task<ActionResult> Create()
         {
-            var categories = await _context.Category.ToListAsync();
+            var categories = await _categoryRepository.GetAll();
 
             ViewData["Categories"] = new SelectList(categories, "Id", "Name");
 
@@ -214,12 +180,11 @@ namespace EventsWebApp.Controllers
 
                 try
                 {
-                    _context.Event.Add(@event);
-                    await _context.SaveChangesAsync();
+                    await _eventRepository.Add(@event);
                 }
                 catch
                 {
-                    var categories = await _context.Category.ToListAsync();
+                    var categories = await _categoryRepository.GetAll();
 
                     ViewData["Categories"] = new SelectList(categories, "Id", "Name");
 
@@ -229,7 +194,7 @@ namespace EventsWebApp.Controllers
                 return RedirectToAction(nameof(IndexUserEvents));
             }
 
-            ViewData["Categories"] = new SelectList(await _context.Category.ToListAsync(), "Id", "Name");
+            ViewData["Categories"] = new SelectList(await _categoryRepository.GetAll(), "Id", "Name");
 
             return View(@event);
         }
@@ -242,9 +207,9 @@ namespace EventsWebApp.Controllers
                 return NotFound();
             }
 
-            Event @event = await _context.Event.Include(e => e.Category).Where(e => e.Id == id).FirstOrDefaultAsync();
+            Event @event = await _eventRepository.GetEvent((int)id);
 
-            var categories = await _context.Category.ToListAsync();
+            var categories = await _categoryRepository.GetAll();
 
             ViewData["Categories"] = new SelectList(categories, "Id", "Name");
 
@@ -266,7 +231,7 @@ namespace EventsWebApp.Controllers
 
                 @event.DateAndTime = date + time;
 
-                Event oldEvent = await _context.Event.FindAsync(id);
+                Event oldEvent = await _eventRepository.GetEvent(id);
 
                 string uniqueFileName = null;
 
@@ -295,13 +260,11 @@ namespace EventsWebApp.Controllers
 
                 try
                 {
-                    _context.Entry(oldEvent).State = EntityState.Detached;
-                    _context.Update(@event);
-                    await _context.SaveChangesAsync();
+                    await _eventRepository.Update(@event, oldEvent);
                 }
                 catch
                 {
-                    var categories = await _context.Category.ToListAsync();
+                    var categories = await _categoryRepository.GetAll();
 
                     ViewData["Categories"] = new SelectList(categories, "Id", "Name");
 
@@ -311,7 +274,7 @@ namespace EventsWebApp.Controllers
                 return RedirectToAction(nameof(IndexUserEvents));
             }
 
-            ViewData["Categories"] = new SelectList(await _context.Category.ToListAsync(), "Id", "Name");
+            ViewData["Categories"] = new SelectList(await _categoryRepository.GetAll(), "Id", "Name");
 
             return View(@event);
         }
@@ -325,9 +288,9 @@ namespace EventsWebApp.Controllers
                 return NotFound();
             }
 
-            Event @event = await _context.Event.Include(e => e.EventAttendees).Where(e => e.Id == id).FirstOrDefaultAsync();
+            Event @event = await _eventRepository.GetEvent((int)id);
 
-            @event.Category = await _context.Category.FindAsync(@event.CategoryId);
+            @event.Category = await _categoryRepository.Get(@event.CategoryId);
 
             return View(@event);
         }
@@ -337,9 +300,7 @@ namespace EventsWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(int id)
         {
-            Event @event = await _context.Event.Include(e => e.EventAttendees).Where(e => e.Id == id).FirstOrDefaultAsync();
-
-            var eventAttendees = await _context.EventAttendee.Where(e => e.EventId == id).ToListAsync();
+            Event @event = await _eventRepository.GetEvent(id);
 
             if (@event.ImageName != null)
             {
@@ -353,10 +314,7 @@ namespace EventsWebApp.Controllers
 
             try
             {
-                _context.EventAttendee.RemoveRange(eventAttendees);
-                _context.Event.Remove(@event);
-
-                await _context.SaveChangesAsync();
+                await _eventRepository.Delete(id);
 
                 return RedirectToAction(nameof(IndexUserEvents));
             }

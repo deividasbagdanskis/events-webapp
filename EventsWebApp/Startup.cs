@@ -1,5 +1,6 @@
 using EmailService;
 using EventsWebApp.Context;
+using EventsWebApp.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,10 @@ namespace EventsWebApp
             var emailConfig = Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
             services.AddSingleton(emailConfig);
             services.AddScoped<IEmailSender, EmailSender>();
+
+            services.AddScoped<IEventRepository, EventRepository>();
+            services.AddScoped<IEventAttendeeRepository, EventAttendeeRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
