@@ -22,14 +22,17 @@ namespace EventsWebApp.Controllers
     public class EventsController : Controller
     {
         private readonly IEventRepository _eventRepository;
+        private readonly IEventAttendeeRepository _eventAttendeeRepository;
         private readonly EventsWebAppContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public EventsController(IEventRepository eventRepository, EventsWebAppContext context, 
-            IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment)
+        public EventsController(IEventRepository eventRepository, IEventAttendeeRepository eventAttendeeRepository, 
+            EventsWebAppContext context, IHttpContextAccessor httpContextAccessor, 
+            IWebHostEnvironment webHostEnvironment)
         {
             _eventRepository = eventRepository;
+            _eventAttendeeRepository = eventAttendeeRepository;
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _webHostEnvironment = webHostEnvironment;
@@ -118,9 +121,7 @@ namespace EventsWebApp.Controllers
 
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            EventAttendee userAttendEvent = await _context.EventAttendee.Include(e => e.Event)
-                                                         .Where(e => e.UserId == userId && e.EventId == id)
-                                                         .FirstOrDefaultAsync();
+            EventAttendee userAttendEvent = await _eventAttendeeRepository.GetUserAttendEvent(userId, (int)id);
 
             bool userWillAttend = false;
 
@@ -182,7 +183,7 @@ namespace EventsWebApp.Controllers
 
                 try
                 {
-                    _eventRepository.Add(@event);
+                    await _eventRepository.Add(@event);
                 }
                 catch
                 {
@@ -233,7 +234,7 @@ namespace EventsWebApp.Controllers
 
                 @event.DateAndTime = date + time;
 
-                Event oldEvent = await _context.Event.FindAsync(id);
+                Event oldEvent = await _eventRepository.GetEvent(id);
 
                 string uniqueFileName = null;
 
@@ -262,7 +263,7 @@ namespace EventsWebApp.Controllers
 
                 try
                 {
-                    _eventRepository.Update(@event, oldEvent);
+                    await _eventRepository.Update(@event, oldEvent);
                 }
                 catch
                 {
@@ -316,7 +317,7 @@ namespace EventsWebApp.Controllers
 
             try
             {
-                _eventRepository.Delete((int)id);
+                await _eventRepository.Delete(id);
 
                 return RedirectToAction(nameof(IndexUserEvents));
             }

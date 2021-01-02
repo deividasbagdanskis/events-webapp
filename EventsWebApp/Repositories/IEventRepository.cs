@@ -18,8 +18,8 @@ namespace EventsWebApp.Repositories
         Task<List<Event>> GetUsersCreatedEvents(string userId);
         Task<List<Event>> GetEventsWhichUserWillAttend(string userId);
         Task<Event> GetEvent(int id);
-        void Add(Event @event);
-        void Update(Event newEvent, Event oldEvent);
-        void Delete(int id);
+        Task Add(Event @event);
+        Task Update(Event newEvent, Event oldEvent);
+        Task Delete(int id);
     }
 }

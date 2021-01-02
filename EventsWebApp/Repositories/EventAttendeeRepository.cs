@@ -15,13 +15,13 @@ namespace EventsWebApp.Repositories
             _context = context;
         }
 
-        public async void Add(EventAttendee eventAttendee)
+        public async Task Add(EventAttendee eventAttendee)
         {
             _context.EventAttendee.Add(eventAttendee);
             await _context.SaveChangesAsync();
         }
 
-        public async void Delete(EventAttendee eventAttendee)
+        public async Task Delete(EventAttendee eventAttendee)
         {
             _context.EventAttendee.Remove(eventAttendee);
             await _context.SaveChangesAsync();

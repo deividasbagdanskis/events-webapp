@@ -1,19 +1,18 @@
-﻿using EventsWebApp.Context;
-using EventsWebApp.Models;
+﻿using EventsWebApp.Models;
+using EventsWebApp.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace EventsWebApp.Controllers
 {
     public class EventAttendeeController : Controller
     {
-        private readonly EventsWebAppContext _context;
+        private readonly IEventAttendeeRepository _eventAttendeeRepository;
 
-        public EventAttendeeController(EventsWebAppContext context)
+        public EventAttendeeController(IEventAttendeeRepository eventAttendeeRepository)
         {
-            _context = context;
+            _eventAttendeeRepository = eventAttendeeRepository;
         }
 
         // POST: EventAttendeeController/Create
@@ -32,8 +31,7 @@ namespace EventsWebApp.Controllers
 
                 try
                 {
-                    _context.EventAttendee.Add(eventAttendee);
-                    await _context.SaveChangesAsync();
+                    await _eventAttendeeRepository.Add(eventAttendee);
 
                     return RedirectToAction("Details", "Events", new { id = eventId});
                 }
@@ -54,13 +52,11 @@ namespace EventsWebApp.Controllers
         {
             if (eventId != 0 && !string.IsNullOrWhiteSpace(userId))
             {
-                EventAttendee eventAttendee = _context.EventAttendee.Where(e => e.EventId == eventId && e.UserId == userId).FirstOrDefault();
+                EventAttendee eventAttendee = await _eventAttendeeRepository.GetEventAttendee(userId, eventId);
 
                 try
                 {
-                    _context.EventAttendee.Remove(eventAttendee);
-
-                    await _context.SaveChangesAsync();
+                    await _eventAttendeeRepository.Delete(eventAttendee);
 
                     return RedirectToAction("Details", "Events", new { id = eventId });
                 }
