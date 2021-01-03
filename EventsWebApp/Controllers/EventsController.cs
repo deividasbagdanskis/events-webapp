@@ -116,16 +116,9 @@ namespace EventsWebApp.Controllers
 
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            EventAttendee userAttendEvent = await _eventAttendeeRepository.GetUserAttendEvent(userId, (int)id);
+            EventAttendee userAttendEvent = await _eventAttendeeRepository.GetEventAttendee(userId, (int)id);
 
-            bool userWillAttend = false;
-
-            if (userAttendEvent != null)
-            {
-                userWillAttend = true;
-            }
-
-            ViewData["UserWillAttend"] = userWillAttend;
+            ViewData["UserWillAttend"] = userAttendEvent != null;
 
             if (@event == null)
             {

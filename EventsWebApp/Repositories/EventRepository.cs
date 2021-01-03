@@ -115,6 +115,7 @@ namespace EventsWebApp.Repositories
         {
             return await _context.EventAttendee.Include(e => e.Event)
                                                 .Include(e => e.Event.Category)
+                                                .Include(e => e.Event.EventAttendees)
                                                 .Where(e => e.UserId == userId)
                                                 .Select(e => e.Event)
                                                 .ToListAsync();
