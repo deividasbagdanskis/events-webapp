@@ -112,6 +112,11 @@ namespace EventsWebApp.Controllers
 
             Event @event = await _eventRepository.GetEvent((int)id);
 
+            if (@event == null)
+            {
+                return NotFound();
+            }
+
             @event.Category = await _categoryRepository.Get(@event.CategoryId);
 
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -119,11 +124,6 @@ namespace EventsWebApp.Controllers
             EventAttendee userAttendEvent = await _eventAttendeeRepository.GetEventAttendee(userId, (int)id);
 
             ViewData["UserWillAttend"] = userAttendEvent != null;
-
-            if (@event == null)
-            {
-                return NotFound();
-            }
 
             return View(@event);
         }

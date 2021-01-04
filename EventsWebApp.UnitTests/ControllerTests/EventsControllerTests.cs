@@ -16,55 +16,27 @@ namespace EventsWebApp.UnitTests.ControllerTests
 {
     public class EventsControllerTests
     {
-        private readonly EventsController _eventsController;
-
-        public EventsControllerTests()
-        {
-            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
-            eventRepository.Setup(er => er.GetAllEvents()).ReturnsAsync(GetTestEvents());
-            eventRepository.Setup(er => er.GetEventsByCityCategory(It.IsAny<string>(), It.IsAny<int>()))
-                           .ReturnsAsync(GetTestEvents());
-            eventRepository.Setup(er => er.GetEventsByCategory(It.IsAny<int>())).ReturnsAsync(GetTestEvents());
-            eventRepository.Setup(er => er.GetEventsByCity(It.IsAny<string>())).ReturnsAsync(GetTestEvents());
-            eventRepository.Setup(er => er.GetEventsByDate(It.IsAny<DateTime>())).ReturnsAsync(GetTestEvents());
-            eventRepository.Setup(er => er.GetEventsByCityCategoryDate(It.IsAny<string>(), It.IsAny<int>(),
-                It.IsAny<DateTime>())).ReturnsAsync(GetTestEvents());
-            eventRepository.Setup(er => er.GetEventsByCityDate(It.IsAny<string>(), It.IsAny<DateTime>()))
-                           .ReturnsAsync(GetTestEvents());
-            eventRepository.Setup(er => er.GetEventsByCategoryDate(It.IsAny<int>(), It.IsAny<DateTime>()))
-                           .ReturnsAsync(GetTestEvents());
-            eventRepository.Setup(er => er.GetUsersCreatedEvents(It.IsAny<string>())).ReturnsAsync(GetTestEvents());
-            eventRepository.Setup(er => er.GetEventsWhichUserWillAttend(It.IsAny<string>()))
-                           .ReturnsAsync(GetTestEvents());
-            eventRepository.Setup(er => er.GetEvent(It.IsAny<int>())).ReturnsAsync(GetTestEvents()[0]);
-
-            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
-            eventAttendeeRepository.Setup(er => er.GetEventAttendee(It.IsAny<string>(), It.IsAny<int>()))
-                                   .ReturnsAsync(GetTestEventAttendee());
-
-            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
-            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
-            categoryRepository.Setup(cr => cr.Get(It.IsAny<int>())).ReturnsAsync(GetTestCategories()[0]);
-
-            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
-            httpContextAccessor.Setup(h => h.HttpContext.User.FindFirst(It.IsAny<string>()))
-                               .Returns(new Claim("name", "Joe Doe"));
-            
-            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
-
-            _eventsController = new EventsController(eventRepository.Object,
-                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
-                imageHelper.Object);
-        }
-
         [Fact]
         public async Task Index_Pass()
         {
-            var result = await _eventsController.Index();
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetAllEvents()).ReturnsAsync(GetTestEvents());
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            var result = await eventsController.Index();
 
             var viewResult = Assert.IsType<ViewResult>(result);
-            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(
-                viewResult.ViewData.Model);
+            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(viewResult.ViewData.Model);
 
             Assert.Equal(3, model.Count);
         }
@@ -72,11 +44,25 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Index_City_Vilnius_Category_1_Pass()
         {
-            var result = await _eventsController.Index("Vilnius", 1);
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEventsByCityCategory(It.IsAny<string>(), It.IsAny<int>()))
+                           .ReturnsAsync(GetTestEvents());
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            var result = await eventsController.Index("Vilnius", 1);
 
             var viewResult = Assert.IsType<ViewResult>(result);
-            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(
-                viewResult.ViewData.Model);
+            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(viewResult.ViewData.Model);
 
             Assert.Equal(3, model.Count);
         }
@@ -84,11 +70,24 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Index_Category_1_Pass()
         {
-            var result = await _eventsController.Index(null, 1, 0);
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEventsByCategory(It.IsAny<int>())).ReturnsAsync(GetTestEvents());
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            var result = await eventsController.Index(null, 1, 0);
 
             var viewResult = Assert.IsType<ViewResult>(result);
-            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(
-                viewResult.ViewData.Model);
+            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(viewResult.ViewData.Model);
 
             Assert.Equal(3, model.Count);
         }
@@ -96,11 +95,24 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Index_City_Vilnius_Pass()
         {
-            var result = await _eventsController.Index("Vilnius");
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEventsByCity(It.IsAny<string>())).ReturnsAsync(GetTestEvents());
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            var result = await eventsController.Index("Vilnius");
 
             var viewResult = Assert.IsType<ViewResult>(result);
-            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(
-                viewResult.ViewData.Model);
+            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(viewResult.ViewData.Model);
 
             Assert.Equal(3, model.Count);
         }
@@ -108,11 +120,24 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Index_Date_7_Pass()
         {
-            var result = await _eventsController.Index(null, 0, 7);
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEventsByDate(It.IsAny<DateTime>())).ReturnsAsync(GetTestEvents());
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            var result = await eventsController.Index(null, 0, 7);
 
             var viewResult = Assert.IsType<ViewResult>(result);
-            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(
-                viewResult.ViewData.Model);
+            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(viewResult.ViewData.Model);
 
             Assert.Equal(3, model.Count);
         }
@@ -120,11 +145,25 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Index_City_Vilnius_Category_1_Date_7_Pass()
         {
-            var result = await _eventsController.Index("Vilnius", 1, 7);
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEventsByCityCategoryDate(It.IsAny<string>(), It.IsAny<int>(),
+                                    It.IsAny<DateTime>())).ReturnsAsync(GetTestEvents());
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            var result = await eventsController.Index("Vilnius", 1, 7);
 
             var viewResult = Assert.IsType<ViewResult>(result);
-            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(
-                viewResult.ViewData.Model);
+            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(viewResult.ViewData.Model);
 
             Assert.Equal(3, model.Count);
         }
@@ -132,11 +171,25 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Index_City_Vilnius_Date_7_Pass()
         {
-            var result = await _eventsController.Index("Vilnius", 0, 7);
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEventsByCityDate(It.IsAny<string>(), It.IsAny<DateTime>()))
+                           .ReturnsAsync(GetTestEvents());
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            var result = await eventsController.Index("Vilnius", 0, 7);
 
             var viewResult = Assert.IsType<ViewResult>(result);
-            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(
-                viewResult.ViewData.Model);
+            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(viewResult.ViewData.Model);
 
             Assert.Equal(3, model.Count);
         }
@@ -144,11 +197,25 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Index_Category_1_Date_7_Pass()
         {
-            var result = await _eventsController.Index(null, 1, 7);
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEventsByCategoryDate(It.IsAny<int>(), It.IsAny<DateTime>()))
+                           .ReturnsAsync(GetTestEvents());
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            var result = await eventsController.Index(null, 1, 7);
 
             var viewResult = Assert.IsType<ViewResult>(result);
-            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(
-                viewResult.ViewData.Model);
+            var model = (List<Event>)Assert.IsAssignableFrom<IEnumerable<Event>>(viewResult.ViewData.Model);
 
             Assert.Equal(3, model.Count);
         }
@@ -156,7 +223,23 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task IndexUserEvents_Pass()
         {
-            var result = await _eventsController.IndexUserEvents();
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetUsersCreatedEvents(It.IsAny<string>())).ReturnsAsync(GetTestEvents());
+            eventRepository.Setup(er => er.GetEventsWhichUserWillAttend(It.IsAny<string>()))
+                           .ReturnsAsync(GetTestEvents());
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            httpContextAccessor.Setup(h => h.HttpContext.User.FindFirst(It.IsAny<string>()))
+                               .Returns(new Claim("name", "Joe Doe"));
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            var result = await eventsController.IndexUserEvents();
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<UserEventsViewModel>(viewResult.ViewData.Model);
@@ -168,8 +251,24 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Details_Id_1_Pass()
         {
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEvent(It.IsAny<int>())).ReturnsAsync(GetTestEvents()[0]);
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.Get(It.IsAny<int>())).ReturnsAsync(GetTestCategories()[0]);
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            httpContextAccessor.Setup(h => h.HttpContext.User.FindFirst(It.IsAny<string>()))
+                               .Returns(new Claim("name", "Joe Doe"));
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
             int eventId = 1;
-            var result = await _eventsController.Details(eventId);
+            var result = await eventsController.Details(eventId);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<Event>(viewResult.ViewData.Model);
@@ -178,9 +277,50 @@ namespace EventsWebApp.UnitTests.ControllerTests
         }
 
         [Fact]
+        public async Task Details_Id_1_Not_Found_Pass()
+        {
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEvent(It.IsAny<int>())).ReturnsAsync((Event)null);
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.Get(It.IsAny<int>())).ReturnsAsync(GetTestCategories()[0]);
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            httpContextAccessor.Setup(h => h.HttpContext.User.FindFirst(It.IsAny<string>()))
+                               .Returns(new Claim("name", "Joe Doe"));
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            var result = await eventsController.Details(1);
+
+            var notFoundResult = Assert.IsType<NotFoundResult>(result);
+            Assert.Equal(404, notFoundResult.StatusCode);
+        }
+
+        [Fact]
         public async Task Details_Id_Null_Pass()
         {
-            var result = await _eventsController.Details(null);
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEvent(It.IsAny<int>())).ReturnsAsync(GetTestEvents()[0]);
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.Get(It.IsAny<int>())).ReturnsAsync(GetTestCategories()[0]);
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            httpContextAccessor.Setup(h => h.HttpContext.User.FindFirst(It.IsAny<string>()))
+                               .Returns(new Claim("name", "Joe Doe"));
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            var result = await eventsController.Details(null);
 
             var notFoundResult = Assert.IsType<NotFoundResult>(result);
             Assert.Equal(404, notFoundResult.StatusCode);
@@ -189,7 +329,19 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Create_Pass()
         {
-            var result = await _eventsController.Create();
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            var result = await eventsController.Create();
 
             Assert.IsType<ViewResult>(result);
         }
@@ -197,12 +349,26 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Create_Event_Date_Time_ImageFile_Pass()
         {
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            httpContextAccessor.Setup(h => h.HttpContext.User.FindFirst(It.IsAny<string>()))
+                               .Returns(new Claim("name", "Joe Doe"));
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
             Event @event = GetTestEvent();
             DateTime date = new DateTime(2021, 1, 9);
             TimeSpan time = new TimeSpan(17, 0, 0);
             IFormFile imageFile = GetTestImage();
 
-            var result = await _eventsController.Create(@event, date, time, imageFile);
+            var result = await eventsController.Create(@event, date, time, imageFile);
 
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 
@@ -212,6 +378,20 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Create_EventName_Null_Date_Time_ImageFile_Pass()
         {
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            httpContextAccessor.Setup(h => h.HttpContext.User.FindFirst(It.IsAny<string>()))
+                               .Returns(new Claim("name", "Joe Doe"));
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
             Event @event = GetTestEvent();
             @event.Name = null;
 
@@ -219,24 +399,69 @@ namespace EventsWebApp.UnitTests.ControllerTests
             TimeSpan time = new TimeSpan(17, 0, 0);
             IFormFile imageFile = GetTestImage();
 
-            _eventsController.ViewData.ModelState.AddModelError("error", "Name is required");
+            eventsController.ViewData.ModelState.AddModelError("error", "Name is required");
 
-            var result = await _eventsController.Create(@event, date, time, imageFile);
+            var result = await eventsController.Create(@event, date, time, imageFile);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<Event>(viewResult.ViewData.Model);
             
-            _eventsController.ViewData.ModelState.Remove("error");
+            eventsController.ViewData.ModelState.Remove("error");
 
             Assert.Equal(@event.Id, model.Id);
         }
 
         [Fact]
+        public async Task Create_Event_Date_Time_ImageFile_Throws_Exception_Pass()
+        {
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.Add(It.IsAny<Event>())).Throws<Exception>();
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            httpContextAccessor.Setup(h => h.HttpContext.User.FindFirst(It.IsAny<string>()))
+                               .Returns(new Claim("name", "Joe Doe"));
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            Event @event = GetTestEvent();
+            DateTime date = new DateTime(2021, 1, 9);
+            TimeSpan time = new TimeSpan(17, 0, 0);
+            IFormFile imageFile = GetTestImage();
+
+            var result = await eventsController.Create(@event, date, time, imageFile);
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+            
+            Assert.IsAssignableFrom<Event>(viewResult.ViewData.Model);
+        }
+
+        [Fact]
         public async Task Edit_Id1_Pass()
         {
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEvent(It.IsAny<int>())).ReturnsAsync(GetTestEvents()[0]);
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
             int eventId = 1;
 
-            var result = await _eventsController.Edit(eventId);
+            var result = await eventsController.Edit(eventId);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<Event>(viewResult.ViewData.Model);
@@ -247,7 +472,21 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Edit_Null_Pass()
         {
-            var result = await _eventsController.Edit(null);
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEvent(It.IsAny<int>())).ReturnsAsync(GetTestEvents()[0]);
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            var result = await eventsController.Edit(null);
 
             var notFoundResult = Assert.IsType<NotFoundResult>(result);
             Assert.Equal(404, notFoundResult.StatusCode);
@@ -256,12 +495,28 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Edit_Event_Date_Time_ImageFile_Pass()
         {
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEvent(It.IsAny<int>())).ReturnsAsync(GetTestEvents()[0]);
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            httpContextAccessor.Setup(h => h.HttpContext.User.FindFirst(It.IsAny<string>()))
+                               .Returns(new Claim("name", "Joe Doe"));
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
             Event @event = GetTestEvent();
             DateTime date = new DateTime(2021, 1, 9);
             TimeSpan time = new TimeSpan(17, 0, 0);
             IFormFile imageFile = GetTestImage();
 
-            var result = await _eventsController.Edit(@event.Id , @event, date, time, imageFile);
+            var result = await eventsController.Edit(@event.Id , @event, date, time, imageFile);
 
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 
@@ -269,14 +524,62 @@ namespace EventsWebApp.UnitTests.ControllerTests
         }
 
         [Fact]
+        public async Task Edit_Event_Date_Time_ImageFile_Throws_Exception_Pass()
+        {
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEvent(It.IsAny<int>())).ReturnsAsync(GetTestEvents()[0]);
+            eventRepository.Setup(er => er.Update(It.IsAny<Event>(), It.IsAny<Event>())).Throws<Exception>();
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            httpContextAccessor.Setup(h => h.HttpContext.User.FindFirst(It.IsAny<string>()))
+                               .Returns(new Claim("name", "Joe Doe"));
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            Event @event = GetTestEvent();
+            DateTime date = new DateTime(2021, 1, 9);
+            TimeSpan time = new TimeSpan(17, 0, 0);
+            IFormFile imageFile = GetTestImage();
+
+            var result = await eventsController.Edit(@event.Id, @event, date, time, imageFile);
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+
+            Assert.IsAssignableFrom<Event>(viewResult.ViewData.Model);
+        }
+
+        [Fact]
         public async Task Edit_Event_Date_Time_ImageFile_Null_Pass()
         {
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEvent(It.IsAny<int>())).ReturnsAsync(GetTestEvents()[0]);
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            httpContextAccessor.Setup(h => h.HttpContext.User.FindFirst(It.IsAny<string>()))
+                               .Returns(new Claim("name", "Joe Doe"));
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
             Event @event = GetTestEvent();
             DateTime date = new DateTime(2021, 1, 9);
             TimeSpan time = new TimeSpan(17, 0, 0);
             IFormFile imageFile = null;
 
-            var result = await _eventsController.Edit(@event.Id, @event, date, time, imageFile);
+            var result = await eventsController.Edit(@event.Id, @event, date, time, imageFile);
 
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 
@@ -286,6 +589,22 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Edit_EventName_Null_Date_Time_ImageFile_Pass()
         {
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEvent(It.IsAny<int>())).ReturnsAsync(GetTestEvents()[0]);
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(GetTestCategories());
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            httpContextAccessor.Setup(h => h.HttpContext.User.FindFirst(It.IsAny<string>()))
+                               .Returns(new Claim("name", "Joe Doe"));
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
             Event @event = GetTestEvent();
             @event.Name = "";
 
@@ -293,14 +612,14 @@ namespace EventsWebApp.UnitTests.ControllerTests
             TimeSpan time = new TimeSpan(17, 0, 0);
             IFormFile imageFile = GetTestImage();
 
-            _eventsController.ViewData.ModelState.AddModelError("error", "Name is required");
+            eventsController.ViewData.ModelState.AddModelError("error", "Name is required");
 
-            var result = await _eventsController.Edit(@event.Id ,@event, date, time, imageFile);
+            var result = await eventsController.Edit(@event.Id ,@event, date, time, imageFile);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<Event>(viewResult.ViewData.Model);
 
-            _eventsController.ViewData.ModelState.Remove("error");
+            eventsController.ViewData.ModelState.Remove("error");
 
             Assert.Equal(@event.Id, model.Id);
         }
@@ -308,9 +627,23 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Delete_Id1_Pass()
         {
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEvent(It.IsAny<int>())).ReturnsAsync(GetTestEvents()[0]);
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.Get(It.IsAny<int>())).ReturnsAsync(GetTestCategories()[0]);
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
             int? eventId = 1;
 
-            var result = await _eventsController.Delete(eventId);
+            var result = await eventsController.Delete(eventId);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<Event>(viewResult.ViewData.Model);
@@ -321,7 +654,21 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task Delete_Null_Pass()
         {
-            var result = await _eventsController.Delete(null);
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEvent(It.IsAny<int>())).ReturnsAsync(GetTestEvents()[0]);
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            categoryRepository.Setup(cr => cr.Get(It.IsAny<int>())).ReturnsAsync(GetTestCategories()[0]);
+
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            var result = await eventsController.Delete(null);
 
             var notFoundResult = Assert.IsType<NotFoundResult>(result);
             Assert.Equal(404, notFoundResult.StatusCode);
@@ -330,13 +677,50 @@ namespace EventsWebApp.UnitTests.ControllerTests
         [Fact]
         public async Task DeleteEvent_Id1_Pass()
         {
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEvent(It.IsAny<int>())).ReturnsAsync(GetTestEvents()[0]);
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
             int eventId = 1;
 
-            var result = await _eventsController.Delete(eventId);
+            var result = await eventsController.Delete(eventId);
 
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
 
             Assert.Equal("IndexUserEvents", redirectToActionResult.ActionName);
+        }
+
+        [Fact]
+        public async Task DeleteEvent_Id1_Throws_Exception_Pass()
+        {
+            Mock<IEventRepository> eventRepository = new Mock<IEventRepository>();
+            eventRepository.Setup(er => er.GetEvent(It.IsAny<int>())).ReturnsAsync(GetTestEvents()[0]);
+            eventRepository.Setup(er => er.Delete(It.IsAny<int>())).Throws<Exception>();
+
+            Mock<IEventAttendeeRepository> eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
+            Mock<ICategoryRepository> categoryRepository = new Mock<ICategoryRepository>();
+            Mock<IHttpContextAccessor> httpContextAccessor = new Mock<IHttpContextAccessor>();
+            Mock<IImageHelper> imageHelper = new Mock<IImageHelper>();
+
+            EventsController eventsController = new EventsController(eventRepository.Object,
+                eventAttendeeRepository.Object, categoryRepository.Object, httpContextAccessor.Object,
+                imageHelper.Object);
+
+            int eventId = 1;
+
+            var result = await eventsController.Delete(eventId);
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+
+            Assert.IsAssignableFrom<int>(viewResult.ViewData.Model);
         }
 
         private List<Event> GetTestEvents()
