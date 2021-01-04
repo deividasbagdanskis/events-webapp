@@ -1,6 +1,6 @@
-﻿using EventsWebApp.Models;
+﻿using EventsWebApp.Context;
+using EventsWebApp.Models;
 using EventsWebApp.Repositories;
-using Moq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -8,13 +8,67 @@ namespace EventsWebApp.UnitTests.RepositoryTests
 {
     public class EventAttendeeRepositoryTests
     {
-        private readonly Mock<IEventAttendeeRepository> _eventAttendeeRepository;
-        private readonly EventAttendee _eventAttendee;
+        private readonly IEventAttendeeRepository _eventAttendeeRepository;
+        private readonly EventsWebAppContext _context;
 
         public EventAttendeeRepositoryTests()
         {
-            _eventAttendeeRepository = new Mock<IEventAttendeeRepository>();
-            _eventAttendee = new EventAttendee()
+            _context = new EventsWebAppContext(Utilities.Utilities.TestDbContextOptions());
+            _eventAttendeeRepository = new EventAttendeeRepository(_context);
+        }
+
+        [Fact]
+        public async Task GetEventAttendee_UserId_jekfekjrfb_EventId_1_Pass()
+        {
+            EventAttendee eventAttendee = GetTestEventAttendee();
+
+            _context.EventAttendee.Add(eventAttendee);
+            await _context.SaveChangesAsync();
+
+            string userId = "jekfekjrfb";
+            int eventId = 1;
+
+            EventAttendee returnedEventAttendee = await _eventAttendeeRepository.GetEventAttendee(userId, 
+                eventId);
+
+            Assert.Equal(1, returnedEventAttendee.Id);
+            Assert.Equal(userId, returnedEventAttendee.UserId);
+            Assert.Equal(eventId, returnedEventAttendee.EventId);
+
+            _context.Remove(eventAttendee);
+            await _context.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task Add_EventAttendee_Pass()
+        {
+            EventAttendee eventAttendee = GetTestEventAttendee();
+
+            await _eventAttendeeRepository.Add(eventAttendee);
+
+            EventAttendee returnedEventAttendee = await _eventAttendeeRepository.GetEventAttendee(eventAttendee.UserId,
+                eventAttendee.EventId);
+
+            Assert.Equal(eventAttendee.User, returnedEventAttendee.User);
+            Assert.Equal(eventAttendee.Event, returnedEventAttendee.Event);
+        }
+
+        [Fact]
+        public async Task Delete_EventAttendee_Pass()
+        {
+            EventAttendee eventAttendee = GetTestEventAttendee();
+
+            _context.EventAttendee.Add(eventAttendee);
+            await _context.SaveChangesAsync();
+
+            await _eventAttendeeRepository.Delete(eventAttendee);
+
+            Assert.Null(await _context.EventAttendee.FindAsync(eventAttendee.Id));
+        }
+
+        private EventAttendee GetTestEventAttendee()
+        {
+            EventAttendee eventAttendee = new EventAttendee()
             {
                 Id = 1,
                 EventId = 1,
@@ -32,37 +86,8 @@ namespace EventsWebApp.UnitTests.RepositoryTests
                     UserName = "Joe Doe"
                 }
             };
-        }
 
-        [Fact]
-        public async Task GetEventAttendee_UserId_jekfekjrfb_EventId_1_Pass()
-        {
-            _eventAttendeeRepository.Setup(er => er.GetEventAttendee(It.IsAny<string>(), It.IsAny<int>()))
-                                    .ReturnsAsync(_eventAttendee);
-
-            string userId = "jekfekjrfb";
-            int eventId = 1;
-
-            EventAttendee returnedEventAttendee = await _eventAttendeeRepository.Object.GetEventAttendee(userId, 
-                eventId);
-
-            Assert.Equal(userId, returnedEventAttendee.UserId);
-        }
-
-        [Fact]
-        public async Task Add_EventAttendee_Pass()
-        {
-            await _eventAttendeeRepository.Object.Add(_eventAttendee);
-
-            _eventAttendeeRepository.Verify(er => er.Add(_eventAttendee), Times.Once);
-        }
-
-        [Fact]
-        public async Task Delete_EventAttendee_Pass()
-        {
-            await _eventAttendeeRepository.Object.Delete(_eventAttendee);
-
-            _eventAttendeeRepository.Verify(er => er.Delete(_eventAttendee), Times.Once);
+            return eventAttendee;
         }
     }
 }
