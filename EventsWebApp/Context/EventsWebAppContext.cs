@@ -1,9 +1,11 @@
 ﻿using EventsWebApp.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EventsWebApp.Context
 {
+    [ExcludeFromCodeCoverage]
     public class EventsWebAppContext : IdentityDbContext<User>
     {
         public EventsWebAppContext(DbContextOptions<EventsWebAppContext> options) : base(options)

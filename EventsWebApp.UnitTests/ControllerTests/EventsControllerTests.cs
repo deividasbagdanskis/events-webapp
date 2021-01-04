@@ -12,7 +12,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace EventsWebApp.UnitTests
+namespace EventsWebApp.UnitTests.ControllerTests
 {
     public class EventsControllerTests
     {
@@ -162,6 +162,7 @@ namespace EventsWebApp.UnitTests
             var model = Assert.IsAssignableFrom<UserEventsViewModel>(viewResult.ViewData.Model);
 
             Assert.Equal(3, model.UsersAttendEvents.Count);
+            Assert.Equal(3, model.UsersCreatedEvents.Count);
         }
 
         [Fact]

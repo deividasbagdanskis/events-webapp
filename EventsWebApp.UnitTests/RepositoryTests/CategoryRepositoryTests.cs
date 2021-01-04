@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace EventsWebApp.UnitTests
+namespace EventsWebApp.UnitTests.RepositoryTests
 {
     public class CategoryRepositoryTests
     {

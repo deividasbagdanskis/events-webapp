@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EventsWebApp.Migrations
 {
+    [ExcludeFromCodeCoverage]
     public partial class CreateCategoryTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

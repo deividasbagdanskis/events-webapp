@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EventsWebApp.Migrations
 {
+    [ExcludeFromCodeCoverage]
     public partial class CreateEventAttendeeTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

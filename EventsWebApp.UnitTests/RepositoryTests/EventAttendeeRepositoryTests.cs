@@ -4,7 +4,7 @@ using Moq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace EventsWebApp.UnitTests
+namespace EventsWebApp.UnitTests.RepositoryTests
 {
     public class EventAttendeeRepositoryTests
     {

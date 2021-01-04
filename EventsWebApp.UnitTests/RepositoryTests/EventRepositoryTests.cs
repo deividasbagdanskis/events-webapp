@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace EventsWebApp.UnitTests
+namespace EventsWebApp.UnitTests.RepositoryTests
 {
     public class EventRepositoryTests
     {
