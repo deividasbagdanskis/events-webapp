@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EventsWebApp.Controllers
 {
@@ -12,6 +13,7 @@ namespace EventsWebApp.Controllers
             return View();
         }
 
+        [ExcludeFromCodeCoverage]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
