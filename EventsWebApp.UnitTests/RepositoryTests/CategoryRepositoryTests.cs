@@ -1,6 +1,6 @@
-﻿using EventsWebApp.Models;
+﻿using EventsWebApp.Context;
+using EventsWebApp.Models;
 using EventsWebApp.Repositories;
-using Moq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
@@ -9,42 +9,76 @@ namespace EventsWebApp.UnitTests.RepositoryTests
 {
     public class CategoryRepositoryTests
     {
-        private readonly Mock<ICategoryRepository> _categoryRepository;
-        private readonly Category _category;
-        private readonly List<Category> _categories;
+        private readonly ICategoryRepository _categoryRepository;
+        private readonly EventsWebAppContext _context;
 
         public CategoryRepositoryTests()
         {
-            _categoryRepository = new Mock<ICategoryRepository>();
-            _category = new Category() { Id = 1, Name = "Music" };
-            _categories = new List<Category>()
-            {
-                _category,
-                new Category() { Id = 2, Name = "Arts" },
-                new Category() { Id = 3, Name = "Film" },
-                new Category() { Id = 4, Name = "Food" },
-                new Category() { Id = 5, Name = "Networking" }
-            };
+            _context = new EventsWebAppContext(Utilities.Utilities.TestDbContextOptions());
+            _categoryRepository = new CategoryRepository(_context);
         }
 
         [Fact]
         public async Task Get_Id_1_Pass()
         {
-            _categoryRepository.Setup(cr => cr.Get(It.IsAny<int>())).ReturnsAsync(_category);
+            Category category = GetTestCategory();
 
-            Category returnedCategory = await _categoryRepository.Object.Get(1);
+            _context.Category.Add(category);
+            await _context.SaveChangesAsync();
+            
+            Category returnedCategory = await _categoryRepository.Get(1);
+            
+            Assert.Equal(category.Id, returnedCategory.Id);
+            Assert.Equal(category.Name, returnedCategory.Name);
+            Assert.Equal(category.Events.Count, returnedCategory.Events.Count);
 
-            Assert.Equal(_category.Name, returnedCategory.Name);
+            _context.Category.Remove(category);
+            await _context.SaveChangesAsync();
         }
 
         [Fact]
         public async Task GetAll_Pass()
         {
-            _categoryRepository.Setup(cr => cr.GetAll()).ReturnsAsync(_categories);
+            List<Category> categories = GetTestCategories();
 
-            List<Category> returnedCategories = await _categoryRepository.Object.GetAll();
+            _context.Category.AddRange(categories);
+            await _context.SaveChangesAsync();
 
-            Assert.Equal(_categories.Count, returnedCategories.Count);
+            List<Category> returnedCategories = await _categoryRepository.GetAll();
+
+            Assert.Equal(categories.Count, returnedCategories.Count);
+
+            _context.RemoveRange(categories);
+            await _context.SaveChangesAsync();
+        }
+
+        private List<Category> GetTestCategories()
+        {
+            List<Category> categories = new List<Category>()
+            {
+                new Category() { Id = 1, Name = "Music" },
+                new Category() { Id = 2, Name = "Arts" },
+                new Category() { Id = 3, Name = "Film" },
+                new Category() { Id = 4, Name = "Food" },
+                new Category() { Id = 5, Name = "Networking" }
+            };
+
+            return categories;
+        }
+
+        private Category GetTestCategory()
+        {
+            Category category = new Category() 
+            { 
+                Id = 1, 
+                Name = "Music", 
+                Events = new List<Event>() 
+                {
+                    new Event() { Id = 1, Name = "Lorem ipsum" }
+                } 
+            };
+
+            return category;
         }
     }
 }
