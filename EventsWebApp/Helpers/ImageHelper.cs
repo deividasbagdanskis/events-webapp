@@ -26,13 +26,15 @@ namespace EventsWebApp.Helpers
             return uniqueFileName;
         }
 
-        public void Delete(string imageName)
+        public bool Delete(string imageName)
         {
             string imagePath = Path.Combine(_imageFolder, imageName);
 
             FileInfo fileInfo = new FileInfo(imagePath);
 
             fileInfo.Delete();
+
+            return !fileInfo.Exists;
         }
     }
 }

@@ -5,6 +5,6 @@ namespace EventsWebApp.Helpers
     public interface IImageHelper
     {
         string Save(IFormFile imageFile);
-        void Delete(string imageName);
+        bool Delete(string imageName);
     }
 }
