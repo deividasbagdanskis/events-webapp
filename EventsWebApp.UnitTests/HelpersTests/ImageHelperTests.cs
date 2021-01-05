@@ -28,7 +28,7 @@ namespace EventsWebApp.UnitTests.HelpersTests
         {
             using FileStream fileStream = new FileStream(_imagePath, FileMode.Open);
 
-            IFormFile formFile = new FormFile(fileStream, 0, 9568,"test_image", "test_image.jpg");
+            IFormFile formFile = new FormFile(fileStream, 0, 9568, "test_image", "test_image.jpg");
 
             string newImageName = _imageHelper.Save(formFile);
             _imageHelper.Delete(newImageName);
