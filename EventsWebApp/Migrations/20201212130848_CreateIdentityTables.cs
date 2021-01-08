@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace EventsWebApp.Migrations
 {
+    [ExcludeFromCodeCoverage]
     public partial class CreateIdentityTables : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -29,12 +29,6 @@ namespace EventsWebApp.Repositories
 
         public async Task<EventAttendee> GetEventAttendee(string userId, int eventId)
         {
-            return await _context.EventAttendee.Where(e => e.EventId == eventId && e.UserId == userId)
-                                                .FirstOrDefaultAsync();
-        }
-
-        public async Task<EventAttendee> GetUserAttendEvent(string userId, int eventId)
-        {
             return await _context.EventAttendee.Include(e => e.Event)
                                                 .Where(e => e.UserId == userId && e.EventId == eventId)
                                                 .FirstOrDefaultAsync();

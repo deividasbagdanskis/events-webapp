@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using EventsWebApp.Context;
 using EventsWebApp.Models;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 [assembly: HostingStartup(typeof(EventsWebApp.Areas.Identity.IdentityHostingStartup))]
 namespace EventsWebApp.Areas.Identity
 {
+    [ExcludeFromCodeCoverage]
     public class IdentityHostingStartup : IHostingStartup
     {
         public void Configure(IWebHostBuilder builder)

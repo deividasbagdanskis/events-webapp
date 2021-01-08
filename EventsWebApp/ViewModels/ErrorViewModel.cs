@@ -1,7 +1,8 @@
-using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EventsWebApp.ViewModels
 {
+    [ExcludeFromCodeCoverage]
     public class ErrorViewModel
     {
         public string RequestId { get; set; }
