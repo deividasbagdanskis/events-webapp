@@ -18,8 +18,9 @@ namespace EventsWebApp.Areas.Identity
         public void Configure(IWebHostBuilder builder)
         {
             builder.ConfigureServices((context, services) => {
-                services.AddDbContext<EventsWebAppContext>(options =>
-                    options.UseSqlServer(context.Configuration.GetConnectionString("EventsWebAppContext")));
+                services.AddDbContextPool<EventsWebAppContext>(options =>
+                    options.UseMySql(context.Configuration.GetConnectionString("EventsWebAppContext"), 
+                    new MySqlServerVersion(new Version(8, 0, 21))));
 
                 services.AddIdentity<User, IdentityRole>(options =>
                 {
