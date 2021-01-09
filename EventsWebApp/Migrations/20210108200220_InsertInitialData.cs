@@ -10,7 +10,11 @@ namespace EventsWebApp.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "a946a04a-1b06-44f6-b72b-388f7e5c5773", 0, "c463ddb3-ba0d-4816-8f0d-edeaf3eb6df1", "v.pavardenis@gmail.com", true, true, null, "V.PAVARDENIS@GMAIL.COM", "V PAVARDENIS", "AQAAAAEAACcQAAAAEKGAVOKhL9/tlVFm93GZyaAOzTQ3ToRCmchisKzYrSX3bT5JgLrPpfDrDT7Aoe7YrQ==", null, false, "2LMI6XECPFVDBOHSLKZUVCXUK7V7547S", false, "V Pavardenis" });
+                values: new object[,]
+                {
+                    { "a946a04a-1b06-44f6-b72b-388f7e5c5773", 0, "c463ddb3-ba0d-4816-8f0d-edeaf3eb6df1", "v.pavardenis@gmail.com", true, true, null, "V.PAVARDENIS@GMAIL.COM", "V PAVARDENIS", "AQAAAAEAACcQAAAAEFmH2lK3ABgU1W7bhF8Us48HvExpLzpJGLAgWfJwB/QXK7bIaYtQADt8RQtzsV5MCA==", null, false, "YUGPQAVDZGSFVZH6UQ6YCMK645BU7YS7", false, "V Pavardenis" },
+                    { "3f976e3b-2e2c-48da-8d93-da414a75e3e4", 0, "c463ddb3-ba0d-4816-8f0d-edeaf3eb6df1", "deividas.bagdanskis@gmail.com", true, true, null, "DEIVIDAS.BAGDANSKIS@GMAIL.COM", "DEIVIDAS BAGDANSKIS", "AQAAAAEAACcQAAAAEKGAVOKhL9/tlVFm93GZyaAOzTQ3ToRCmchisKzYrSX3bT5JgLrPpfDrDT7Aoe7YrQ==", null, false, "2LMI6XECPFVDBOHSLKZUVCXUK7V7547S", false, "Deividas Bagdanskis" }
+                });
 
             migrationBuilder.InsertData(
                 table: "Category",
@@ -30,7 +34,7 @@ namespace EventsWebApp.Migrations
             migrationBuilder.InsertData(
                 table: "Event",
                 columns: new[] { "Id", "Address", "CategoryId", "City", "DateAndTime", "Description", "ImageName", "Name", "UserId" },
-                values: new object[] { 1, "720 9th Ave", 1, "New York", new DateTime(2021, 1, 14, 17, 0, 0, 0, DateTimeKind.Local), "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed suscipit fermentum tortor, non pharetra erat. Donec at felis purus. Vivamus nisi lorem, congue eu nisl quis, tincidunt accumsan est. Nam id nulla ex. Cras pretium ante quis sagittis vestibulum. In eu vehicula massa. Duis dapibus consequat erat a eleifend.Nullam rutrum finibus magna vel viverra. Sed quis leo laoreet,elementum nunc bibendum, aliquam nulla.Integer eu nunc arcu.Vivamus dapibus sem leo.In ut turpis eu risus sollicitudin pellentesque eu sit amet lorem.Morbi suscipit sem sit amet vestibulum placerat. Phasellus sed ultricies odio, at facilisis est.Integer enim ex, malesuada vitae blandit et, tempus nec nulla.", "ff6cda08-29ce-4436-9298-bdd467d1210f_highres_491103347.png", "Lorem ipsum dolor sit amet elit.", "a946a04a-1b06-44f6-b72b-388f7e5c5773" });
+                values: new object[] { 1, "720 9th Ave", 1, "New York", new DateTime(2021, 1, 14, 17, 0, 0, 0, DateTimeKind.Local), "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed suscipit fermentum tortor, non pharetra erat. Donec at felis purus. Vivamus nisi lorem, congue eu nisl quis, tincidunt accumsan est. Nam id nulla ex. Cras pretium ante quis sagittis vestibulum. In eu vehicula massa. Duis dapibus consequat erat a eleifend.Nullam rutrum finibus magna vel viverra. Sed quis leo laoreet,elementum nunc bibendum, aliquam nulla.Integer eu nunc arcu.Vivamus dapibus sem leo.In ut turpis eu risus sollicitudin pellentesque eu sit amet lorem.Morbi suscipit sem sit amet vestibulum placerat. Phasellus sed ultricies odio, at facilisis est.Integer enim ex, malesuada vitae blandit et, tempus nec nulla.", "ff6cda08-29ce-4436-9298-bdd467d1210f_highres_491103347.png", "Lorem ipsum dolor sit amet elit.", "3f976e3b-2e2c-48da-8d93-da414a75e3e4" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -79,6 +83,11 @@ namespace EventsWebApp.Migrations
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "a946a04a-1b06-44f6-b72b-388f7e5c5773");
+
+            migrationBuilder.DeleteData(
+                table: "AspNetUsers",
+                keyColumn: "Id",
+                keyValue: "3f976e3b-2e2c-48da-8d93-da414a75e3e4");
 
             migrationBuilder.DeleteData(
                 table: "Category",

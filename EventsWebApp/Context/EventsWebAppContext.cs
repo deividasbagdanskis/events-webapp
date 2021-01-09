@@ -17,18 +17,34 @@ namespace EventsWebApp.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<User>().HasData(new User()
+            modelBuilder.Entity<User>().HasData( new[]
             {
-                Id = "a946a04a-1b06-44f6-b72b-388f7e5c5773",
-                UserName = "V Pavardenis",
-                NormalizedUserName = "V PAVARDENIS",
-                Email = "v.pavardenis@gmail.com",
-                NormalizedEmail = "V.PAVARDENIS@GMAIL.COM",
-                EmailConfirmed = true,
-                PasswordHash = "AQAAAAEAACcQAAAAEKGAVOKhL9/tlVFm93GZyaAOzTQ3ToRCmchisKzYrSX3bT5JgLrPpfDrDT7Aoe7YrQ==",
-                SecurityStamp = "2LMI6XECPFVDBOHSLKZUVCXUK7V7547S",
-                ConcurrencyStamp = "c463ddb3-ba0d-4816-8f0d-edeaf3eb6df1",
-                LockoutEnabled = true
+                new User()
+                {
+                    Id = "a946a04a-1b06-44f6-b72b-388f7e5c5773",
+                    UserName = "V Pavardenis",
+                    NormalizedUserName = "V PAVARDENIS",
+                    Email = "v.pavardenis@gmail.com",
+                    NormalizedEmail = "V.PAVARDENIS@GMAIL.COM",
+                    EmailConfirmed = true,
+                    PasswordHash = "AQAAAAEAACcQAAAAEFmH2lK3ABgU1W7bhF8Us48HvExpLzpJGLAgWfJwB/QXK7bIaYtQADt8RQtzsV5MCA==",
+                    SecurityStamp = "YUGPQAVDZGSFVZH6UQ6YCMK645BU7YS7",
+                    ConcurrencyStamp = "c463ddb3-ba0d-4816-8f0d-edeaf3eb6df1",
+                    LockoutEnabled = true
+                },
+                new User()
+                {
+                    Id = "3f976e3b-2e2c-48da-8d93-da414a75e3e4",
+                    UserName = "Deividas Bagdanskis",
+                    NormalizedUserName = "DEIVIDAS BAGDANSKIS",
+                    Email = "deividas.bagdanskis@gmail.com",
+                    NormalizedEmail = "DEIVIDAS.BAGDANSKIS@GMAIL.COM",
+                    EmailConfirmed = true,
+                    PasswordHash = "AQAAAAEAACcQAAAAEKGAVOKhL9/tlVFm93GZyaAOzTQ3ToRCmchisKzYrSX3bT5JgLrPpfDrDT7Aoe7YrQ==",
+                    SecurityStamp = "2LMI6XECPFVDBOHSLKZUVCXUK7V7547S",
+                    ConcurrencyStamp = "c463ddb3-ba0d-4816-8f0d-edeaf3eb6df1",
+                    LockoutEnabled = true
+                }
             });
 
             modelBuilder.Entity<Category>().HasData( new []
