@@ -15,12 +15,12 @@ namespace EventsWebApp.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ImageName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DateAndTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Name = table.Column<string>(type: "varchar(255)", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    City = table.Column<string>(type: "text", nullable: true),
+                    Address = table.Column<string>(type: "text", nullable: true),
+                    ImageName = table.Column<string>(type: "text", nullable: true),
+                    DateAndTime = table.Column<DateTime>(type: "datetime", nullable: false)
                 },
                 constraints: table =>
                 {

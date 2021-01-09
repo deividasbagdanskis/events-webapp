@@ -17,7 +17,7 @@ namespace EventsWebApp.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "Discriminator",
                 table: "AspNetUsers",
-                type: "nvarchar(max)",
+                type: "nvarchar(256)",
                 nullable: false,
                 defaultValue: "");
 
@@ -27,7 +27,7 @@ namespace EventsWebApp.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UserId = table.Column<string>(type: "varchar(50)", nullable: true),
                     EventId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>

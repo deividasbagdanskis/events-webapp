@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EventsWebApp
@@ -29,8 +30,9 @@ namespace EventsWebApp
 
             services.AddRazorPages();
 
-            services.AddDbContext<EventsWebAppContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("EventsWebAppContext")));
+            services.AddDbContextPool<EventsWebAppContext>(options =>
+                options.UseMySql(Configuration.GetConnectionString("EventsWebAppContext"), 
+                new MySqlServerVersion(new Version(8, 0, 21))));
 
             var emailConfig = Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
             services.AddSingleton(emailConfig);
